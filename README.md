@@ -39,6 +39,6 @@
 
 ### （3）效果图
 
-[![LV6QC6.md.gif](https://s1.ax1x.com/2022/04/11/LV6QC6.md.gif)](https://imgtu.com/i/LV6QC6)
+[![LV6QC6.gif](https://s1.ax1x.com/2022/04/11/LV6QC6.gif)](https://imgtu.com/i/LV6QC6)
 
    
