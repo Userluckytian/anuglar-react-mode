@@ -1,0 +1,23 @@
+@import "variables.scss";
+/* （1）响应式 */
+@mixin respondTo($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+
+    @media screen and (min-width: $value) {
+      @content;
+    }
+  }
+  @warn "Unknown `#{$breakpoint}` in $breakpoints";
+}
+
+// （2）使用：
+// .box {
+//   border: solid 1px #ddd;
+//   width: calc(100vw - 40px);
+//   height: calc(100vh - 40px);
+//   background-color: #f2f2f2;
+//   @include respondTo(medium) {
+//     background-color: #666;
+//   }
+// }

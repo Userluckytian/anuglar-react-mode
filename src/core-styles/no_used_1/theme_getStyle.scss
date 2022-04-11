@@ -1,0 +1,65 @@
+@import "theme_config.scss";
+@import "theme_theme.scss";
+// 非链接：
+// (1)通过这个先生成两套样式,并全局存储!
+@mixin themed() {
+  @each $theme, $map in $config {
+    // theme_config.scss
+    .theme--#{$theme} & {
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        // $value: map-get(map-get($config, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $submap,
+          )
+        ) !global;
+      }
+      @content;
+      $theme-map: null !global;
+    }
+  }
+}
+
+// ---------------s-p-l-i-t-----分--隔--线-----------------------------
+
+// 链接:
+// (2)和（1）一模一样
+@mixin getThemeStyle() {
+  @each $theme_key, $theme_name in $themes {
+    // theme_theme.scss
+    @if map-has-key($config, $theme_name) {
+      // theme_config.scss
+      .theme--#{$theme_name} & {
+        $theme-map: () !global;
+        @each $style_key, $style_value in map-get($config, $theme_name) {
+          $theme-map: map-merge(
+            $theme-map,
+            (
+              $style_key: $style_value,
+            )
+          ) !global;
+        }
+        @content;
+        $theme-map: null !global;
+      }
+    } @else {
+      @warn "The key `#{$theme_name} isn't defined in the map $config`";
+    }
+  }
+}
+
+// (3)这里直接使用：$theme-map已经是全局变量
+@function t($key) {
+  @return map-get($theme-map, $key);
+}
+// （4）使用：
+// .button {
+//   @include themed() {
+//     background: t(bg);
+//   }
+//   @include getThemeStyle() {
+//     background: t(bg);
+//   }
+// }

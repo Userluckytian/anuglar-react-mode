@@ -1,0 +1,18 @@
+/* */
+@function layer($name) {
+  @if map-has-key($layer, $name) {
+    @return map-get($layer, $name);
+  }
+
+  @warn "The key #{$name} is not in the map '$layer'";
+  @return null;
+}
+
+/* 
+  现在让我们加入setcolor方法来获取颜色的不同选择。
+  第一个参数是Sass map的对象($scheme)-在这个例子中可能是gray或者brown，
+  第二个参数就是你想要的颜色($tone)，默认值是base。 
+  */
+@function setColor($scheme, $tone: base) {
+  @return map-get(map-get($colorscheme, $scheme), $tone);
+}

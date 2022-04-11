@@ -1,0 +1,22 @@
+$config: (
+  default: (
+    logo: url("../images/brand/logo_vertical.svg"),
+    bg: rgb(25, 247, 80),
+    // card-bg: $bg--card--light,
+    // text: $text--light,
+    // text-secondary: $text--2--light,
+    // link: $brand--blue--light,
+    // hover: $hover--light,
+    // border: $border--light,
+  ),
+  dark: (
+    logo: url("../images/brand/logo_vertical--invert.svg"),
+    bg: rgb(37, 236, 220),
+    // card-bg: $bg--card--dark,
+    // text: $text--dark,
+    // text-secondary: $text--2--dark,
+    // link: $brand--blue--dark,
+    // hover: $hover--dark,
+    // border: $border--dark,
+  ),
+);

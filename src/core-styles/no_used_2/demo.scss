@@ -1,0 +1,281 @@
+// 在线测试场地：http://www.wetools.com/sass-to-css
+// 参考文献: https://jelly.jd.com/article/6006b1025b6c6a01506c8783
+// ------------------------one：循环Map生成类-----------------------------------
+/* 定义一个sass map名称为$icons */
+$icons: (
+  checkmark: a,
+  plus: b,
+  minus: c,
+);
+
+@each $name, $value in $icons {
+  .icon--#{$name} {
+    content: $value;
+  }
+}
+/* 遍历map的所有key，创建各自的类 
+*/
+
+/** output
+    .icon--checkmark {
+    content: "a";
+    }
+
+    .icon--plus {
+    content: "b";
+    }
+
+    .icon--minus {
+    content: "c";
+    }
+*/
+
+// ------------------------two：拿出Maps的多个值-----------------------------------
+/* 第一个值作为背景色，第二个值作为字体颜色 */
+$buttons: (
+  error: (
+    #d82d2d,
+    #666,
+  ),
+  success: (
+    #52bf4a,
+    #fff,
+  ),
+  warning: (
+    #c23435,
+    #fff,
+  ),
+);
+.m-button {
+  display: inling-block;
+  padding: 0.5em;
+  background: #ccc;
+  color: #666;
+
+  @each $name, $colors in $buttons {
+    $bgcolor: nth($colors, 1);
+    $fontcolor: nth($colors, 2);
+
+    &--#{$name} {
+      background-color: $bgcolor;
+      color: $fontcolor;
+    }
+  }
+}
+/** 使用
+*/
+/** output
+    .m-button {
+        display: inline-block;
+        padding: .5em;
+        background: #ccc;
+        color: #666;
+    }
+
+    .m-button--error {
+        background-color: #d82d2d;
+        color: #666;
+    }
+
+    .m-button--success {
+        background-color: #52bf4a;
+        color: #fff;
+    }
+
+    .m-button--warning {
+        background-color: #c23435;
+        color: #fff;
+    }
+*/
+
+// ------------------------three：处理层(z-index)-----------------------------------
+/* 在项目中多个地方需要使用到z-index */
+$layer: (
+  offcanvas: 1,
+  lightbox: 500,
+  dropdown: 10,
+  tooltip: 15,
+);
+
+// _m-lightboxes.scss
+@function layer($name) {
+  @if map-has-key($layer, $name) {
+    @return map-get($layer, $name);
+  }
+
+  @warn "The key #{$name} is not in the map '$layer'";
+  @return null;
+}
+/** 使用
+    .m-lightbox {
+    z-index: layer(lightbox);
+    }
+*/
+/** output
+    .m-lightbox {
+        z-index: 500;
+    }
+*/
+// ------------------------four：在项目中为字体创建基本样式-----------------------------------
+/** 旧的方式：
+    $base-font-color: #666;
+    $base-font-family: Arial, Heletica, Sans-Serif;
+    $base-font-size: 16px;
+    $base-line-height: 1.4;
+*/
+/* 新的方式 */
+$font: (
+  color: #666,
+  family: (
+    Arial,
+    Helvetica,
+  ),
+  size: 16px,
+  line-height: 1.4,
+);
+
+/** 使用
+    body {
+    color: map-get($font, color);
+    font-family: map-get($font, family);
+    font-size: map-get($font, size);
+    line-height: map-get($font, line-height);
+    }
+*/
+/** output
+    body {
+        color: #666;
+        font-family: Arial, Helvetica; // 这里是去掉括号的！
+        font-size: 16px;
+        line-height: 1.4;
+    }
+*/
+// ------------------------five：响应式处理-----------------------------------
+/* 设置多个断点 */
+$breakpoints: (
+  small: 320px,
+  medium: 600px,
+  large: 768px,
+);
+
+/* 设置 Mixin 去使用断点 */
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+
+    @media screen and (min-width: $value) {
+      @content;
+    }
+  }
+  @warn "Unknown `#{$breakpoint}` in $breakpoints";
+}
+/* 使用 
+    .m-tabs {
+        background-color: #f2f2f2;
+        @include reponse-to(medium) {
+            background-color: #666;
+        }
+    }
+*/
+
+/** output
+  .m-tabs {
+    background-color: #f2f2f2;
+  }
+  @media screen and (min-width: 600px) {
+    background-color: #666;
+  }
+*/
+// ------------------------six：颜色的高级使用-----------------------------------
+// Scheme of colors
+$colorscheme: (
+  gray: (
+    base: #ccc,
+    light: #f2f2f2,
+    dark: #666,
+  ),
+  brown: (
+    base: #ab906b,
+    light: #ecdac3,
+    dark: #5e421c,
+  ),
+);
+/* 
+  现在让我们加入setcolor方法来获取颜色的不同选择。
+  第一个参数是Sass map的对象($scheme)-在这个例子中可能是gray或者brown，
+  第二个参数就是你想要的颜色($tone)，默认值是base。 
+  */
+@function setColor($scheme, $tone: base) {
+  @return map-get(map-get($colorscheme, $scheme), $tone);
+}
+
+// Sass
+.element {
+  color: setcolor(brown);
+}
+.element--light {
+  color: setcolor(brown, light);
+}
+
+/** output
+    .element {
+        color: #ab906b;
+    }
+    .element--light {
+        color: #ecdac3;
+    }
+*/
+
+// ------------------------seven：通过Classes定制主题-----------------------------------
+// (1)定义themes
+$themes: (
+  theme1: theme-light,
+  theme2: theme-dark,
+);
+// (2)获取值（捷径）
+@function setStyle($map, $object, $style) {
+  @if map-has-key($map, $object) {
+    @return map-get(map-get($map, $object), $style);
+  }
+  @warn "The key `#{$object}` is not available in the map.";
+  @return null;
+}
+// (3) 生成模块
+// _m-buttons.scss
+// 1.Config
+$config: (
+  theme1: (
+    background: #f2f2f2,
+    color: #000,
+  ),
+  theme2: (
+    background: #666,
+    color: #fff,
+  ),
+);
+// (4)遍历主题
+// _m-buttons.scss
+// 2.Base
+.m-button {
+  @each $key, $value in $themes {
+    @if map-has-key($config, $key) {
+      .#{$value} & {
+        background: setStyle($config, $key, background);
+        color: setStyle($config, $key, color);
+      }
+    } @else {
+      @warn "The key `#{$key} isn't defined in the map $config`";
+    }
+  }
+}
+
+/*   Output
+    .theme-light .m-button {
+      background: #f2f2f2;
+      color: #000;
+    }
+    .theme-dark .m-button {
+      background: #666;
+      color: #fff;
+    }
+*/
